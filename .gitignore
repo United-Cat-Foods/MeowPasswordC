@@ -1,3 +1,6 @@
 *.o
 meowpass
 test_meowpass
+build/
+__pycache__/
+*.pyc
