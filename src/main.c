@@ -1,0 +1,119 @@
+/*
+ * main.c - MeowPassword Main Entry Point
+ * Cat Name Based Secure Password Generator
+ *
+ * Copyright (c) 2025 Jeffrey Kunzelman
+ * MIT License
+ */
+
+#define _POSIX_C_SOURCE 200809L
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include "meowpass.h"
+
+/**
+ * Copy password to clipboard using xclip on Linux
+ */
+static void copy_to_clipboard(const char *password) {
+#ifdef __linux__
+    /* Check if xclip is available */
+    FILE *test = popen("which xclip 2>/dev/null", "r");
+    if (test) {
+        char buf[256];
+        if (fgets(buf, sizeof(buf), test) != NULL) {
+            pclose(test);
+
+            /* Use xclip to copy to clipboard */
+            FILE *clip = popen("xclip -selection clipboard", "w");
+            if (clip) {
+                fprintf(clip, "%s", password);
+                pclose(clip);
+                printf("\nPassword copied to clipboard!\n");
+                return;
+            }
+        } else {
+            pclose(test);
+        }
+    }
+    printf("\nClipboard functionality requires xclip (apt install xclip)\n");
+#else
+    printf("\nClipboard functionality only available on Linux with xclip\n");
+#endif
+}
+
+/**
+ * Find the best candidate (highest score)
+ */
+static int find_best_candidate(PasswordCandidate *candidates, int count) {
+    int best_idx = 0;
+    double best_score = candidates[0].complexity.score;
+
+    for (int i = 1; i < count; i++) {
+        if (candidates[i].complexity.score > best_score) {
+            best_score = candidates[i].complexity.score;
+            best_idx = i;
+        }
+    }
+
+    return best_idx;
+}
+
+int main(int argc, char *argv[]) {
+    /* Seed random number generator */
+    srand((unsigned int)time(NULL));
+
+    /* Parse configuration */
+    PasswordConfig config;
+    config_init(&config, argc, argv);
+
+    /* Handle help */
+    if (config.show_help) {
+        display_help();
+        return 0;
+    }
+
+    /* Handle test mode */
+    if (config.show_tests) {
+        return run_tests();
+    }
+
+    /* Show header */
+    display_header();
+
+    /* Load cat names */
+    size_t names_count = get_cat_names_count();
+    if (names_count == 0) {
+        fprintf(stderr, "ERROR: No cat names loaded from embedded data.\n");
+        return 1;
+    }
+
+    printf("Loaded %zu meow cat names\n", names_count);
+    printf("Generating 5 secure password meow candidates...\n");
+    printf("Config: %d numbers, %d symbols, max meow length %d\n\n",
+           config.num_numbers, config.num_symbols, config.max_length);
+
+    /* Generate 5 password candidates */
+    PasswordCandidate candidates[NUM_CANDIDATES];
+
+    for (int i = 0; i < NUM_CANDIDATES; i++) {
+        generate_password(&config, candidates[i].password, MAX_PASSWORD_LENGTH);
+        analyze_complexity(candidates[i].password, &candidates[i].complexity);
+        display_candidate(i + 1, &candidates[i]);
+    }
+
+    /* Select the best password */
+    int best_idx = find_best_candidate(candidates, NUM_CANDIDATES);
+
+    display_final_selection(&candidates[best_idx]);
+
+    /* Copy to clipboard if requested */
+    if (config.copy_to_clipboard) {
+        copy_to_clipboard(candidates[best_idx].password);
+    } else {
+        printf("\nUse 'meowpass --copy' to copy password to clipboard\n");
+    }
+
+    return 0;
+}

@@ -1,0 +1,25 @@
+Source: meowpass
+Section: utils
+Priority: optional
+Maintainer: Jeffrey Kunzelman <jeff@example.com>
+Build-Depends: debhelper-compat (= 13), cmake (>= 3.10)
+Standards-Version: 4.6.0
+Homepage: https://github.com/meowpassword/meowpassc
+Rules-Requires-Root: no
+
+Package: meowpass
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Suggests: xclip
+Description: Cat Name Based Secure Password Generator
+ MeowPassword generates secure, memorable passwords using a database
+ of over 16,000 cat names. The generated passwords include:
+ .
+  - Base phrases from randomly selected cat names
+  - Random capitalization of letters
+  - Insertion of random numbers
+  - Replacement of letters with symbols
+ .
+ Password quality is measured using Shannon entropy, compression
+ resistance, pattern complexity, and character diversity metrics
+ to ensure generated passwords meet security requirements.

@@ -1,0 +1,76 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential cmake debhelper devscripts
+
+    - name: Build
+      run: make
+
+    - name: Run tests
+      run: ./meowpass --test
+
+    - name: Build Debian package
+      run: |
+        dpkg-buildpackage -us -uc -b || true
+
+    - name: Create tarball
+      run: |
+        VERSION=${GITHUB_REF#refs/tags/v}
+        tar -czvf meowpass-${VERSION}.tar.gz \
+          --transform "s,^,meowpass-${VERSION}/," \
+          src/ tests/ debian/ .github/ \
+          CMakeLists.txt Makefile README.md LICENSE meowpass.1
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          meowpass-*.tar.gz
+          ../*.deb
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-multi-arch:
+    runs-on: ubuntu-latest
+    needs: release
+
+    strategy:
+      matrix:
+        arch: [amd64, arm64]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+      if: matrix.arch != 'amd64'
+
+    - name: Build for ${{ matrix.arch }}
+      run: |
+        if [ "${{ matrix.arch }}" = "amd64" ]; then
+          make
+        else
+          echo "Cross-compilation for ${{ matrix.arch }} would require additional setup"
+        fi
+
+    - name: Upload binary
+      uses: actions/upload-artifact@v4
+      with:
+        name: meowpass-${{ matrix.arch }}
+        path: meowpass
+        if-no-files-found: ignore

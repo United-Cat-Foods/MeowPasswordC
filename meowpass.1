@@ -1,0 +1,87 @@
+.TH MEOWPASS 1 "February 2025" "meowpass 1.0.0" "User Commands"
+.SH NAME
+meowpass \- generate secure, memorable passwords using cat names
+.SH SYNOPSIS
+.B meowpass
+[\fIOPTIONS\fR]
+.SH DESCRIPTION
+.B meowpass
+generates secure, memorable passwords by combining random cat names with
+various transformations including capitalization, digit insertion, and
+symbol substitution. It includes analysis of password strength using
+Shannon entropy, Kolmogorov complexity estimation, and pattern analysis.
+.PP
+The generator uses an embedded dictionary of 16,913 cat names to create
+passwords that are both secure and easier to remember than purely random
+strings.
+.SH OPTIONS
+.TP
+.BR \-l ", " \-\-length " " \fINUM\fR
+Set the target password length (default: 16, range: 8-128).
+.TP
+.BR \-c ", " \-\-complexity " " \fINUM\fR
+Set the complexity level from 1-10 (default: 5). Higher values result in
+more character substitutions and transformations.
+.TP
+.BR \-n ", " \-\-count " " \fINUM\fR
+Generate multiple passwords (default: 1).
+.TP
+.BR \-v ", " \-\-verbose
+Show detailed complexity analysis for the generated password.
+.TP
+.BR \-\-copy
+Copy the generated password to the system clipboard using xclip.
+.TP
+.BR \-\-test
+Run the built-in test suite to verify correct operation.
+.TP
+.BR \-h ", " \-\-help
+Display help message and exit.
+.TP
+.BR \-\-version
+Display version information and exit.
+.SH COMPLEXITY ANALYSIS
+When run with the \fB\-v\fR option, meowpass displays:
+.TP
+.B Shannon Entropy
+Information entropy in bits per character, measuring password randomness.
+.TP
+.B Compression Ratio
+An approximation of Kolmogorov complexity based on run-length encoding,
+indicating how compressible (and thus predictable) the password is.
+.TP
+.B Pattern Complexity
+A score based on substring uniqueness within the password.
+.TP
+.B Character Diversity
+Coverage across four character classes: lowercase letters, uppercase
+letters, digits, and symbols.
+.SH EXAMPLES
+.TP
+Generate a default password:
+.B meowpass
+.TP
+Generate a 24-character password with high complexity:
+.B meowpass -l 24 -c 8
+.TP
+Generate 5 passwords with verbose analysis:
+.B meowpass -n 5 -v
+.TP
+Generate and copy to clipboard:
+.B meowpass --copy
+.SH EXIT STATUS
+.TP
+.B 0
+Success.
+.TP
+.B 1
+Error occurred.
+.SH DEPENDENCIES
+Optional: xclip for clipboard support.
+.SH AUTHOR
+Jeffrey Kunzelman
+.SH COPYRIGHT
+Copyright (c) 2025 Jeffrey Kunzelman. MIT License.
+.SH SEE ALSO
+.BR pwgen (1),
+.BR xclip (1)
