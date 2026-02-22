@@ -1,0 +1,87 @@
+name: Auto Release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'Makefile'
+      - 'CMakeLists.txt'
+      - 'debian/**'
+
+permissions:
+  contents: write
+
+jobs:
+  build-test-release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for version calculation
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential cmake debhelper devscripts python3-pip
+
+    - name: Build
+      run: make
+
+    - name: Run tests
+      run: ./meowpass --test
+
+    - name: Install behave and run cucumber tests
+      run: |
+        pip install behave
+        behave --no-capture || true
+
+    - name: Build Debian package
+      run: dpkg-buildpackage -us -uc -b
+
+    - name: Calculate version
+      id: version
+      run: |
+        # Get latest tag or start at v0.1.0
+        LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+        # Extract major.minor.patch
+        VERSION=${LATEST_TAG#v}
+        IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+        # Bump patch
+        PATCH=$((PATCH + 1))
+        NEW_VERSION="v${MAJOR}.${MINOR}.${PATCH}"
+        echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+        echo "New version: $NEW_VERSION"
+
+    - name: Create tag and release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        VERSION=${{ steps.version.outputs.version }}
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git tag -a "$VERSION" -m "Auto-release $VERSION"
+        git push origin "$VERSION"
+
+    - name: Create tarball
+      run: |
+        VERSION=${{ steps.version.outputs.version }}
+        VERSION_NUM=${VERSION#v}
+        tar -czvf meowpass-${VERSION_NUM}.tar.gz \
+          --transform "s,^,meowpass-${VERSION_NUM}/," \
+          src/ tests/ debian/ .github/ \
+          CMakeLists.txt Makefile README.md LICENSE meowpass.1
+
+    - name: Publish GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ steps.version.outputs.version }}
+        name: "MeowPassword ${{ steps.version.outputs.version }}"
+        files: |
+          meowpass-*.tar.gz
+          ../*.deb
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
