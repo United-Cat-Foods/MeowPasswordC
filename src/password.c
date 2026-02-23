@@ -186,10 +186,10 @@ void generate_password(const PasswordConfig *config, char *output, size_t output
     /* Step 3: Apply security transformations */
     randomly_capitalize(output, 3);
     insert_random_numbers(output, output_size, config->num_numbers);
-    replace_with_symbols(output, config->num_symbols);
 
-    /* Ensure final password doesn't exceed max length */
+    /* Truncate before symbol replacement so symbols aren't placed past max_length */
     if (strlen(output) > (size_t)config->max_length) {
         output[config->max_length] = '\0';
     }
+    replace_with_symbols(output, config->num_symbols);
 }
