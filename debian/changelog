@@ -1,9 +1,0 @@
-meowpass (1.0.0-1) unstable; urgency=medium
-
-  * Initial release
-  * Ported from Swift to pure C11
-  * Includes 16,913 embedded cat names
-  * Implements Shannon entropy and Kolmogorov complexity analysis
-  * Added clipboard support via xclip
-
- -- Jeffrey Kunzelman <jeff@example.com>  Sat, 22 Feb 2025 12:00:00 +0000

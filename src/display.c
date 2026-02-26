@@ -61,6 +61,7 @@ void display_analysis(const ComplexityResult *result, const char *password) {
     printf("    - Shiny Foil Ball Uniqueness: %.1f%%\n", result->pattern_complexity * 100.0);
     printf("    - Percent of Organic NonGMO Catnip: %.1f%%\n", result->character_diversity * 100.0);
     printf("    - Overall Relavency: %.2f/10.0\n", result->score);
+    printf("    (Lower relevancy is better - high relevance passwords are easy for cats to crack!)\n");
 }
 
 void display_candidate(int index, const PasswordCandidate *candidate) {

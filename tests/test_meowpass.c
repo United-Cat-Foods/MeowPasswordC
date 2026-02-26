@@ -6,6 +6,7 @@
  * MIT License
  */
 
+#define _POSIX_C_SOURCE 200809L
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -181,6 +182,44 @@ static void test_config_parsing(void) {
 }
 
 /**
+ * Test relevancy score explanation in display output
+ */
+static void test_relevancy_score_explanation(void) {
+    printf("\nTesting Relevancy Score Explanation...\n");
+
+    /* Create a test complexity result */
+    ComplexityResult result;
+    result.length = 20;
+    result.entropy = 3.5;
+    result.compression_ratio = 0.8;
+    result.pattern_complexity = 0.9;
+    result.character_diversity = 1.0;
+    result.score = 2.45;
+
+    /* Capture display_analysis output by redirecting stdout */
+    char buffer[2048];
+    FILE *memstream = fmemopen(buffer, sizeof(buffer), "w");
+    assert_true(memstream != NULL, "Should open memory stream for output capture");
+
+    FILE *old_stdout = stdout;
+    stdout = memstream;
+    display_analysis(&result, "testMeow123!");
+    fflush(stdout);
+    stdout = old_stdout;
+    fclose(memstream);
+
+    /* Verify the explanation is present */
+    assert_true(strstr(buffer, "Lower relevancy is better") != NULL,
+                "Display should explain that lower relevancy is better");
+    assert_true(strstr(buffer, "easy for cats to crack") != NULL,
+                "Display should warn about high relevance passwords being easy for cats to crack");
+    assert_true(strstr(buffer, "Overall Relavency") != NULL,
+                "Display should show Overall Relavency score");
+
+    printf("Relevancy explanation tests passed!\n");
+}
+
+/**
  * Run all tests (exported function)
  */
 int run_tests(void) {
@@ -195,6 +234,7 @@ int run_tests(void) {
     test_shannon_entropy();
     test_character_diversity();
     test_config_parsing();
+    test_relevancy_score_explanation();
 
     printf("\nMeow Basic Tests Complete!\n");
     printf("=====================\n");

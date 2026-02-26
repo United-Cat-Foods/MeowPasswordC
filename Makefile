@@ -67,10 +67,6 @@ cmake-build:
 	mkdir -p build
 	cd build && cmake .. && make
 
-# Debian package build
-deb:
-	dpkg-buildpackage -us -uc -b
-
 # Dependencies
 $(SRCDIR)/main.o: $(SRCDIR)/meowpass.h
 $(SRCDIR)/config.o: $(SRCDIR)/meowpass.h

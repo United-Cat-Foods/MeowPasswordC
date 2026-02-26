@@ -15,7 +15,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential cmake debhelper devscripts python3-pip
+        sudo apt-get install -y build-essential cmake python3-pip
 
     - name: Build
       run: make
@@ -28,15 +28,12 @@ jobs:
         pip install behave
         behave --no-capture
 
-    - name: Build Debian package
-      run: dpkg-buildpackage -us -uc -b
-
     - name: Create tarball
       run: |
         VERSION=${GITHUB_REF#refs/tags/v}
         tar -czvf meowpass-${VERSION}.tar.gz \
           --transform "s,^,meowpass-${VERSION}/," \
-          src/ tests/ debian/ .github/ \
+          src/ tests/ .github/ \
           CMakeLists.txt Makefile README.md LICENSE meowpass.1
 
     - name: Create Release
@@ -44,7 +41,6 @@ jobs:
       with:
         files: |
           meowpass-*.tar.gz
-          ../*.deb
         generate_release_notes: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

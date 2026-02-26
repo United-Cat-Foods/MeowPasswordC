@@ -1,5 +1,9 @@
 # MeowPassword C
 
+[![CI](https://github.com/SpaceTrucker2196/MeowPasswordC/actions/workflows/ci.yml/badge.svg)](https://github.com/SpaceTrucker2196/MeowPasswordC/actions/workflows/ci.yml)
+[![C/C++ CI](https://github.com/SpaceTrucker2196/MeowPasswordC/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/SpaceTrucker2196/MeowPasswordC/actions/workflows/c-cpp.yml)
+[![CMake on a single platform](https://github.com/SpaceTrucker2196/MeowPasswordC/actions/workflows/cmake-single-platform.yml/badge.svg)](https://github.com/SpaceTrucker2196/MeowPasswordC/actions/workflows/cmake-single-platform.yml)
+
 A secure, memorable password generator that uses cat names to create strong passwords. Ported from Swift to pure C11 for Linux/Debian systems.
 
 ## Features
@@ -32,13 +36,6 @@ make
 
 ```bash
 sudo make install
-```
-
-Or build a Debian package:
-
-```bash
-make deb
-sudo dpkg -i ../meowpass_*.deb
 ```
 
 ## Usage
