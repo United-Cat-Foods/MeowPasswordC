@@ -24,6 +24,7 @@ void config_init(PasswordConfig *config, int argc, char *argv[]) {
     config->show_tests = false;
     config->copy_to_clipboard = false;
     config->show_help = false;
+    config->check_update = false;
 
     /* Parse command line arguments */
     for (int i = 1; i < argc; i++) {
@@ -51,6 +52,8 @@ void config_init(PasswordConfig *config, int argc, char *argv[]) {
             config->copy_to_clipboard = true;
         } else if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
             config->show_help = true;
+        } else if (strcmp(argv[i], "--update") == 0) {
+            config->check_update = true;
         }
     }
 }

@@ -14,6 +14,7 @@ SOURCES = $(SRCDIR)/main.c \
           $(SRCDIR)/complexity.c \
           $(SRCDIR)/catnames.c \
           $(SRCDIR)/display.c \
+          $(SRCDIR)/update.c \
           $(TESTDIR)/test_meowpass.c
 
 # Object files
@@ -74,4 +75,5 @@ $(SRCDIR)/password.o: $(SRCDIR)/meowpass.h
 $(SRCDIR)/complexity.o: $(SRCDIR)/meowpass.h
 $(SRCDIR)/catnames.o: $(SRCDIR)/meowpass.h
 $(SRCDIR)/display.o: $(SRCDIR)/meowpass.h
+$(SRCDIR)/update.o: $(SRCDIR)/meowpass.h
 $(TESTDIR)/test_meowpass.o: $(SRCDIR)/meowpass.h

@@ -25,6 +25,7 @@ set(SOURCES
     src/complexity.c
     src/catnames.c
     src/display.c
+    src/update.c
     tests/test_meowpass.c
 )
 

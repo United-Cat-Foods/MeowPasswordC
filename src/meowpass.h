@@ -30,6 +30,10 @@
 /* Maximum password buffer size */
 #define MAX_PASSWORD_LENGTH 128
 
+/* GitHub repository for update checks */
+#define MEOWPASS_GITHUB_OWNER "SpaceTrucker2196"
+#define MEOWPASS_GITHUB_REPO  "MeowPasswordC"
+
 /* Configuration structure */
 typedef struct {
     int num_numbers;
@@ -38,6 +42,7 @@ typedef struct {
     bool show_tests;
     bool copy_to_clipboard;
     bool show_help;
+    bool check_update;
 } PasswordConfig;
 
 /* Complexity analysis result */
@@ -188,6 +193,23 @@ void display_candidate(int index, const PasswordCandidate *candidate);
  * @param candidate Best password candidate
  */
 void display_final_selection(const PasswordCandidate *candidate);
+
+/* ============ Update Functions (update.c) ============ */
+
+/**
+ * Compare two semantic version strings (e.g. "1.0.0" vs "1.0.1")
+ * @param current Current version string
+ * @param latest Latest version string
+ * @return 1 if latest > current, 0 if equal, -1 if latest < current
+ */
+int compare_versions(const char *current, const char *latest);
+
+/**
+ * Check GitHub for a newer release, prompt user, and install if desired.
+ * Requires curl to be installed.
+ * @return 0 on success or no update, non-zero on error
+ */
+int check_for_update(void);
 
 /* ============ Test Functions (for --test mode) ============ */
 
