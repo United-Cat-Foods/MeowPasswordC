@@ -41,6 +41,7 @@ typedef struct {
     int max_length;
     bool show_tests;
     bool copy_to_clipboard;
+    bool psssst;
     bool show_help;
     bool check_update;
 } PasswordConfig;
