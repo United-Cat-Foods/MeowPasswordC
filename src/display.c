@@ -28,7 +28,8 @@ static const char *LOLCAT_ART =
 "                             `'\n";
 
 void display_header(void) {
-    printf("%s", LOLCAT_ART);
+    /* Orange color using ANSI 256-color escape code */
+    printf("\033[38;5;208m%s\033[0m", LOLCAT_ART);
     printf("Meow Password - Cat Name Based Secure Password Generator\n");
     printf("========================================================\n");
 }
@@ -44,6 +45,7 @@ void display_help(void) {
     printf("  --max-length N   Maximum password length (15-50, default: 25)\n");
     printf("  --test           Run tests\n");
     printf("  --copy           Copy password to clipboard (Linux xclip required)\n");
+    printf("  --update         Check GitHub for updates and install if available\n");
     printf("  --help, -h       Show this help message\n");
     printf("\n");
     printf("Examples:\n");

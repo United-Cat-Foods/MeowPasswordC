@@ -220,6 +220,30 @@ static void test_relevancy_score_explanation(void) {
 }
 
 /**
+ * Test update checker version comparison
+ */
+static void test_update_version_compare(void) {
+    printf("\nTesting Update Version Comparison...\n");
+
+    assert_equal_int(compare_versions("1.0.0", "1.0.0"), 0,
+                     "Same version should return 0");
+    assert_equal_int(compare_versions("1.0.0", "1.0.1"), 1,
+                     "Newer patch version should return 1");
+    assert_equal_int(compare_versions("1.0.0", "1.1.0"), 1,
+                     "Newer minor version should return 1");
+    assert_equal_int(compare_versions("1.0.0", "2.0.0"), 1,
+                     "Newer major version should return 1");
+    assert_equal_int(compare_versions("1.0.1", "1.0.0"), -1,
+                     "Older patch version should return -1");
+    assert_equal_int(compare_versions("2.0.0", "1.9.9"), -1,
+                     "Older version should return -1");
+    assert_equal_int(compare_versions("0.0.1", "0.0.2"), 1,
+                     "Pre-release newer patch should return 1");
+
+    printf("Update version comparison tests passed!\n");
+}
+
+/**
  * Run all tests (exported function)
  */
 int run_tests(void) {
@@ -235,6 +259,7 @@ int run_tests(void) {
     test_character_diversity();
     test_config_parsing();
     test_relevancy_score_explanation();
+    test_update_version_compare();
 
     printf("\nMeow Basic Tests Complete!\n");
     printf("=====================\n");

@@ -79,6 +79,11 @@ int main(int argc, char *argv[]) {
         return run_tests();
     }
 
+    /* Handle update check */
+    if (config.check_update) {
+        return check_for_update();
+    }
+
     /* Show header */
     display_header();
 
