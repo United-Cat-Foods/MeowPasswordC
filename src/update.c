@@ -52,6 +52,18 @@ static int parse_tag_from_json(const char *json, char *out, size_t out_size) {
     return (i > 0) ? 0 : -1;
 }
 
+/**
+ * Validate that a version string contains only safe characters (digits and dots).
+ * Returns 1 if valid, 0 otherwise.
+ */
+static int is_valid_version(const char *version) {
+    if (!version || !*version) return 0;
+    for (const char *p = version; *p; p++) {
+        if (*p != '.' && (*p < '0' || *p > '9')) return 0;
+    }
+    return 1;
+}
+
 int check_for_update(void) {
     printf("Checking for updates...\n");
 
@@ -63,7 +75,7 @@ int check_for_update(void) {
 
     FILE *fp = popen(cmd, "r");
     if (!fp) {
-        fprintf(stderr, "Error: Could not run curl. Is curl installed?\n");
+        fprintf(stderr, "Error: Could not execute update check command.\n");
         return -1;
     }
 
@@ -73,6 +85,7 @@ int check_for_update(void) {
     size_t n;
     while ((n = fread(buf + total, 1, sizeof(buf) - total - 1, fp)) > 0) {
         total += n;
+        if (total >= sizeof(buf) - 1) break;
     }
     buf[total] = '\0';
     pclose(fp);
@@ -86,6 +99,12 @@ int check_for_update(void) {
     char latest_version[64];
     if (parse_tag_from_json(buf, latest_version, sizeof(latest_version)) != 0) {
         fprintf(stderr, "Error: Could not parse version from GitHub response.\n");
+        return -1;
+    }
+
+    /* Validate version string to prevent shell injection */
+    if (!is_valid_version(latest_version)) {
+        fprintf(stderr, "Error: Invalid version format received from GitHub.\n");
         return -1;
     }
 
@@ -104,6 +123,10 @@ int check_for_update(void) {
     fflush(stdout);
 
     int ch = getchar();
+    /* Consume remaining characters in the input line */
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF) { /* discard */ }
+
     if (ch != 'y' && ch != 'Y') {
         printf("Update skipped.\n");
         return 0;
@@ -130,7 +153,7 @@ int check_for_update(void) {
 
     int ret = system(install_cmd);
     if (ret != 0) {
-        fprintf(stderr, "Error: Update installation failed.\n");
+        fprintf(stderr, "Error: Update failed. Check output above for details.\n");
         return -1;
     }
 
