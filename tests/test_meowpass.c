@@ -178,6 +178,22 @@ static void test_config_parsing(void) {
     assert_equal_int(config2.num_numbers, MAX_NUMBERS, "Numbers should be clamped to max");
     assert_equal_int(config2.num_symbols, MIN_SYMBOLS, "Symbols should be clamped to min");
 
+    /* Test --psssst flag */
+    char *argv3[] = {"meowpass", "--psssst"};
+    PasswordConfig config3;
+    config_init(&config3, 2, argv3);
+
+    assert_true(config3.psssst, "Psssst should be enabled with --psssst");
+    assert_true(config3.copy_to_clipboard, "Copy to clipboard should be enabled with --psssst");
+
+    /* Test -p flag */
+    char *argv4[] = {"meowpass", "-p"};
+    PasswordConfig config4;
+    config_init(&config4, 2, argv4);
+
+    assert_true(config4.psssst, "Psssst should be enabled with -p");
+    assert_true(config4.copy_to_clipboard, "Copy to clipboard should be enabled with -p");
+
     printf("Config parsing tests passed!\n");
 }
 

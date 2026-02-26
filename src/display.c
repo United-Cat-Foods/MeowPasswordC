@@ -45,6 +45,8 @@ void display_help(void) {
     printf("  --max-length N   Maximum password length (15-50, default: 25)\n");
     printf("  --test           Run tests\n");
     printf("  --copy           Copy password to clipboard (Linux xclip required)\n");
+    printf("  --psssst, -p     Copy password to clipboard without displaying it\n");
+    printf("                   (more secure - password won't be shown in clear text)\n");
     printf("  --update         Check GitHub for updates and install if available\n");
     printf("  --help, -h       Show this help message\n");
     printf("\n");

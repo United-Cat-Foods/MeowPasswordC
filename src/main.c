@@ -16,7 +16,7 @@
 /**
  * Copy password to clipboard using xclip on Linux
  */
-static void copy_to_clipboard(const char *password) {
+static void copy_to_clipboard(const char *password, bool silent) {
 #ifdef __linux__
     /* Check if xclip is available */
     FILE *test = popen("which xclip 2>/dev/null", "r");
@@ -30,7 +30,11 @@ static void copy_to_clipboard(const char *password) {
             if (clip) {
                 fprintf(clip, "%s", password);
                 pclose(clip);
-                printf("\nPassword copied to clipboard!\n");
+                if (silent) {
+                    printf("----> copied!\n");
+                } else {
+                    printf("\nPassword copied to clipboard!\n");
+                }
                 return;
             }
         } else {
@@ -39,6 +43,7 @@ static void copy_to_clipboard(const char *password) {
     }
     printf("\nClipboard functionality requires xclip (apt install xclip)\n");
 #else
+    (void)silent;
     printf("\nClipboard functionality only available on Linux with xclip\n");
 #endif
 }
@@ -84,9 +89,6 @@ int main(int argc, char *argv[]) {
         return check_for_update();
     }
 
-    /* Show header */
-    display_header();
-
     /* Load cat names */
     size_t names_count = get_cat_names_count();
     if (names_count == 0) {
@@ -94,30 +96,43 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    printf("Loaded %zu meow cat names\n", names_count);
-    printf("Generating 5 secure password meow candidates...\n");
-    printf("Config: %d numbers, %d symbols, max meow length %d\n\n",
-           config.num_numbers, config.num_symbols, config.max_length);
-
     /* Generate 5 password candidates */
     PasswordCandidate candidates[NUM_CANDIDATES];
 
-    for (int i = 0; i < NUM_CANDIDATES; i++) {
-        generate_password(&config, candidates[i].password, MAX_PASSWORD_LENGTH);
-        analyze_complexity(candidates[i].password, &candidates[i].complexity);
-        display_candidate(i + 1, &candidates[i]);
-    }
-
-    /* Select the best password */
-    int best_idx = find_best_candidate(candidates, NUM_CANDIDATES);
-
-    display_final_selection(&candidates[best_idx]);
-
-    /* Copy to clipboard if requested */
-    if (config.copy_to_clipboard) {
-        copy_to_clipboard(candidates[best_idx].password);
+    if (config.psssst) {
+        /* Silent mode: generate passwords, copy best to clipboard, no display */
+        for (int i = 0; i < NUM_CANDIDATES; i++) {
+            generate_password(&config, candidates[i].password, MAX_PASSWORD_LENGTH);
+            analyze_complexity(candidates[i].password, &candidates[i].complexity);
+        }
+        int best_idx = find_best_candidate(candidates, NUM_CANDIDATES);
+        copy_to_clipboard(candidates[best_idx].password, true);
     } else {
-        printf("\nUse 'meowpass --copy' to copy password to clipboard\n");
+        /* Normal mode: show everything */
+        display_header();
+
+        printf("Loaded %zu meow cat names\n", names_count);
+        printf("Generating 5 secure password meow candidates...\n");
+        printf("Config: %d numbers, %d symbols, max meow length %d\n\n",
+               config.num_numbers, config.num_symbols, config.max_length);
+
+        for (int i = 0; i < NUM_CANDIDATES; i++) {
+            generate_password(&config, candidates[i].password, MAX_PASSWORD_LENGTH);
+            analyze_complexity(candidates[i].password, &candidates[i].complexity);
+            display_candidate(i + 1, &candidates[i]);
+        }
+
+        /* Select the best password */
+        int best_idx = find_best_candidate(candidates, NUM_CANDIDATES);
+
+        display_final_selection(&candidates[best_idx]);
+
+        /* Copy to clipboard if requested */
+        if (config.copy_to_clipboard) {
+            copy_to_clipboard(candidates[best_idx].password, false);
+        } else {
+            printf("\nUse 'meowpass --copy' to copy password to clipboard\n");
+        }
     }
 
     return 0;

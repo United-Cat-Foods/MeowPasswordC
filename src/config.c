@@ -23,6 +23,7 @@ void config_init(PasswordConfig *config, int argc, char *argv[]) {
     config->max_length = DEFAULT_MAX_LENGTH;
     config->show_tests = false;
     config->copy_to_clipboard = false;
+    config->psssst = false;
     config->show_help = false;
     config->check_update = false;
 
@@ -49,6 +50,9 @@ void config_init(PasswordConfig *config, int argc, char *argv[]) {
         } else if (strcmp(argv[i], "--test") == 0) {
             config->show_tests = true;
         } else if (strcmp(argv[i], "--copy") == 0) {
+            config->copy_to_clipboard = true;
+        } else if (strcmp(argv[i], "--psssst") == 0 || strcmp(argv[i], "-p") == 0) {
+            config->psssst = true;
             config->copy_to_clipboard = true;
         } else if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
             config->show_help = true;
